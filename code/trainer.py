@@ -28,8 +28,15 @@ class AutoEncoderTrainer:
         self.device = device
         self.vgg_alpha = vgg_alpha
         self._vgg = None if vgg_alpha == 0.0 else tv.models.vgg19(pretrained=True).to(device)
-        self.encoder = Encoder(resnet_model_name=resnet_model_name, quantize_levels=quantize_levels).to(device)
-        self.decoder = Decoder(resnet_model_name=resnet_model_name).to(device)
+
+        self.encoder = Encoder(
+            resnet_model_name=resnet_model_name, quantize_levels=quantize_levels
+        ).to(device).train()
+
+        self.decoder = Decoder(
+            resnet_model_name=resnet_model_name
+        ).to(device).train()
+
         self.save_results_every = save_results_every
 
     def train(self):
@@ -49,7 +56,7 @@ class AutoEncoderTrainer:
         )
 
         for epoch in range(self.epochs):
-            for x, _ in loader:
+            for x in loader:
                 x = x.to(self.device)
                 latent = self.encoder(x)
                 x_hat = self.decoder(latent)

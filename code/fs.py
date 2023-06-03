@@ -1,22 +1,16 @@
 import os
 
 
-def get_models_dir(models_dir: str, latent_dim: int, quantize_levels: int):
-    return os.path.join(
-        models_dir,
-        f"latent_dim={latent_dim}",
-        f"quantize_levels={quantize_levels}"
-    )
+def get_model_name(resnet_model_name: str, quantize_levels: int, is_encoder: bool):
+    part_name = "encoder" if is_encoder else "decoder"
+    return f"{resnet_model_name}_B={quantize_levels}_{part_name}.pth"
 
 
-def get_model_path(models_dir: str, latent_dim: int, quantize_levels: int, model_name: str):
-    return os.path.join(
-        get_models_dir(models_dir, latent_dim, quantize_levels),
-        f"{model_name}.pth"
-    )
+def get_model_path(models_dir: str, resnet_model_name, quantize_levels: int, is_encoder: bool):
+    model_name = get_model_name(resnet_model_name, quantize_levels, is_encoder)
+    return os.path.join(models_dir, model_name)
 
 
 __all__ = [
-    "get_models_dir",
     "get_model_path"
 ]
