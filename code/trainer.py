@@ -11,11 +11,11 @@ class AutoEncoderTrainer:
     def __init__(
             self,
             root: str,
+            resnet_model_name: str,
+            quantize_levels: int,
             epochs: int,
             batch_size: int,
             lr: float,
-            encoder: Encoder,
-            decoder: Decoder,
             device: torch.device,
             vgg_alpha: float = 0.0,
     ):
@@ -23,11 +23,11 @@ class AutoEncoderTrainer:
         self.epochs = epochs
         self.batch_size = batch_size
         self.lr = lr
-        self.encoder = encoder.to(device)
-        self.decoder = decoder.to(device)
         self.device = device
         self.vgg_alpha = vgg_alpha
         self._vgg = None if vgg_alpha == 0.0 else tv.models.vgg19(pretrained=True).to(device)
+        self.encoder = Encoder(resnet_model_name=resnet_model_name, quantize_levels=quantize_levels).to(device)
+        self.decoder = Decoder(resnet_model_name=resnet_model_name).to(device)
 
     def train(self):
         mse = torch.nn.MSELoss()
@@ -61,6 +61,8 @@ class AutoEncoderTrainer:
                 loss.backward()
                 optimizer.step()
             print(f"Epoch: {epoch}, Loss: {loss.item()}")
+
+        return self.encoder, self.decoder
 
 
 __all__ = [
