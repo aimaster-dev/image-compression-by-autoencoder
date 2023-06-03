@@ -1,15 +1,22 @@
-# Image compression using Auto-Encoder neural network with ResNet-34 bottleneck blocks
+# Image compression using variational auto-encoder
 
-## Introduction
+This project is a simple implementation of auto-encoder neural network for image compression.
+The auto-encoder neural network is trained on the ImageNet dataset. The trained model is then used to compress and
+decompress the images.
 
-This project is a simple implementation of auto-encoder neural network for image compression. The auto-encoder neural
-network is trained on the ImageNet dataset. The trained model is then used to compress and decompress the images. The
-compressed images are stored in a file and can be decompressed later.
+## Model architecture
+
+Model represents a variational auto-encoder with residual blocks and skip connections.
+
+* Encoder: _ResNet-34 architecture with fully connected layers_
+* Decoder: _ResNet-34 architecture with transposed convolution layers_
+* Loss: _VGG loss + MSE loss + KL divergence loss (from VAE)_
 
 ## Download pretrained models
 
-Here are the links to download the pretrained models:
+Models were trained on ImageNet dataset subset (20000 images).
 
+Here are the links to download the pretrained models:
 _B = number of quantization levels_, _L = latent dimension_
 
 * [B=2, L=128]()
@@ -17,8 +24,8 @@ _B = number of quantization levels_, _L = latent dimension_
 
 Put downloaded models in `models` directory.
 
-
 ## Quick example:
+
 ```shell
 # Compress the `baboon` image from assets/images directory
 
