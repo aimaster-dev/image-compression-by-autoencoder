@@ -1,4 +1,4 @@
-# Image compression using Auto-encoder neural network
+# Image compression using Auto-Encoder neural network with ResNet-34 bottleneck blocks
 
 ## Introduction
 
