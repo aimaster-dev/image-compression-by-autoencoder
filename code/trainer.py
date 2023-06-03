@@ -1,6 +1,5 @@
 import code.vision.utils as vision_utils
 from code.vision import Decoder, Encoder
-
 from itertools import chain
 
 import torch
