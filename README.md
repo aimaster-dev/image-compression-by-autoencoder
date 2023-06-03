@@ -8,19 +8,19 @@ decompress the images.
 
 Model represents a variational auto-encoder with residual blocks and skip connections.
 
-* Encoder: _ResNet-34 architecture with fully connected layers_
-* Decoder: _ResNet-34 architecture with transposed convolution layers_
-* Loss: _VGG loss + MSE loss + KL divergence loss (from VAE)_
+* Encoder: _ResNet-18 architecture with fully connected layers_
+* Decoder: _ResNet-18 architecture with transposed convolution layers_
+* Loss: _VGG loss + MSE loss_
 
 ## Download pretrained models
 
 Models were trained on ImageNet dataset subset (20000 images).
 
 Here are the links to download the pretrained models:
-_B = number of quantization levels_, _L = latent dimension_
+_B = number of quantization levels_
 
-* [B=2, L=128]()
-* [B=4, L=256]()
+* [B=2, resnet18]()
+* [B=4, resnet18]()
 
 Put downloaded models in `models` directory.
 
@@ -73,13 +73,21 @@ python decompress.py \
 
 ```shell
 python train.py \
-  --root [path to dataset] \
+  --root [path to images] \
+  --resnet-model [resnet model architecture] \
   --epochs [number of epochs] \
   --batch_size [batch size] \
   --lr [learning rate] \
-  --save_path [path to save model] \
   --device [torch device to train on] \
-  --vgg_alpha [alpha for vgg loss] \
-  --latent_dim [latent dimension] \
-  --quantize_levels [number of quantization levels]
+  --vgg_alpha [weight of VGG loss] \
+  --quantize_levels [number of quantization levels] \
+  --save_results_every [save results every n epochs] \
+  --save_models_dir [path to save models]
 ```
+
+## Results
+
+### Compression
+
+| Original image size | Compressed image size (B=2, L=128) | Compressed image size (B=4, L=256) |
+|---------------------|------------------------------------|------------------------------------|
