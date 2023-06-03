@@ -1,8 +1,10 @@
+import os
 from code.vision import Decoder, Encoder
 from code.vision.dataset import ImageDataset
 from code.vision.utils import vgg_loss
 from itertools import chain
 
+import matplotlib.pyplot as plt
 import torch
 import torch.utils.data as td
 import torchvision as tv
@@ -55,6 +57,8 @@ class AutoEncoderTrainer:
             shuffle=True
         )
 
+        os.makedirs("train_logs", exist_ok=True)
+
         for epoch in range(self.epochs):
             for x in loader:
                 x = x.to(self.device)
@@ -68,6 +72,15 @@ class AutoEncoderTrainer:
                 optimizer.zero_grad()
                 loss.backward()
                 optimizer.step()
+
+            if epoch % self.save_results_every == 0:
+                first_batch = next(iter(loader))
+                limit = min(self.batch_size, 8)
+                plt.subplots(figsize=(limit * 2, 2))
+                # Convert first image to Pillow image
+                x_hat = tv.transforms.ToPILImage()(x_hat[0].cpu())
+                x_hat.save(f"train_logs/{epoch}_{loss.item()}.png")
+
             print(f"Epoch: {epoch}, Loss: {loss.item()}")
 
         return self.encoder, self.decoder
