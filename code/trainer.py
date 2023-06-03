@@ -47,15 +47,11 @@ class AutoEncoderTrainer:
             chain(self.encoder.parameters(), self.decoder.parameters()),
             lr=self.lr
         )
-        dataset = ImageDataset(
-            self.root,
-            transform=tv.transforms.ToTensor(),
-        )
-        loader = td.DataLoader(
-            dataset,
-            batch_size=self.batch_size,
-            shuffle=True
-        )
+        dataset = ImageDataset(self.root, transform=tv.transforms.Compose([
+            tv.transforms.Resize((512, 512)),
+            tv.transforms.ToTensor(),
+        ]))
+        loader = td.DataLoader(dataset, batch_size=self.batch_size, shuffle=True)
 
         # Clear train_logs directory
         shutil.rmtree("train_logs", ignore_errors=True)
