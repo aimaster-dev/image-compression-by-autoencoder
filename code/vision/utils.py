@@ -1,9 +1,9 @@
+import dataclasses
+import typing as tp
+
 import torch
 import torch.nn as nn
 import torchvision.models.resnet as resnet_models
-
-import dataclasses
-import typing as tp
 
 
 def vgg_loss(vgg: nn.Module, x: torch.Tensor, x_hat: torch.Tensor) -> torch.Tensor:

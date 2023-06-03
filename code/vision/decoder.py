@@ -1,8 +1,8 @@
+from code.vision import utils
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-
-from code.vision import utils
 
 
 class Upsample(nn.Module):
