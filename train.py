@@ -1,8 +1,8 @@
 import argparse
 import code.fs as fs
 import os
-from code.trainer import AutoEncoderTrainer
 import warnings
+from code.trainer import AutoEncoderTrainer
 
 import torch
 
@@ -24,7 +24,10 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     print("Starting training with the following parameters:")
-    print(args)
+    for arg in vars(args):
+        print(f"{arg}: {getattr(args, arg)}")
+
+    print()
 
     trainer = AutoEncoderTrainer(
         root=args.root,
@@ -35,6 +38,7 @@ if __name__ == "__main__":
         lr=args.lr,
         device=args.device,
         vgg_alpha=args.vgg_alpha,
+        save_results_every=args.save_results_every,
     )
 
     encoder, decoder = trainer.train()
