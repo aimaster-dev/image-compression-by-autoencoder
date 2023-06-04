@@ -72,7 +72,7 @@ bash scripts/decompress_all.sh 8 resnet18 cpu
 python compress.py \
   --image=assets/images/baboon.png \
   --output=assets/compressed/baboon.bin \
-  --models_dir=models \
+  --models-dir=models \
   --resnet-model=resnet18 \
   --qb=8 \
   --device=cuda
@@ -87,7 +87,7 @@ python decompress.py \
   --output=assets/decompressed/baboon.png \
   --qb=8 \
   --resnet-model=resnet18 \
-  --models_dir=models \
+  --models-dir=models \
   --device=cuda
 ```
 
@@ -100,11 +100,12 @@ python train.py \
   --resnet-model [resnet model architecture] \
   --qb [number of quantization levels] \
   --epochs [number of epochs] \
-  --batch_size [batch size] \
+  --batch-size [batch size] \
   --lr [learning rate] \
   --device [torch device to train on] \
-  --save_results_every [save results every n epochs] \
-  --save_models_dir [path to save models]
+  --save-results-every [save results every n epochs] \
+  --save-models-dir [path to save models] \
+  --use-checkpoint [use checkpoint to resume training]
 ```
 
 ## Results
