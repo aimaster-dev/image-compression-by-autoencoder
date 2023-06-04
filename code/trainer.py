@@ -42,7 +42,7 @@ class AutoEncoderTrainer:
 
         self.encoder = Encoder(
             resnet_model_name=resnet_model_name, quantize_levels=quantize_levels
-        ).to(device).eval()
+        ).to(device).train()
 
         self.decoder = Decoder(
             resnet_model_name=resnet_model_name
@@ -79,9 +79,7 @@ class AutoEncoderTrainer:
             mse_loss = None
             for batch_num, x in enumerate(bar):
                 x = x.to(self.device)
-                with torch.no_grad():
-                    latent = self.encoder(x)
-
+                latent = self.encoder(x)
                 x_hat = self.decoder(latent)
 
                 loss = mse(x_hat, x)
