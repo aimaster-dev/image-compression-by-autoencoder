@@ -1,7 +1,8 @@
 import argparse
-import torch
-
 import code.fs as fs
+from code.coding import CompressedImage, decompress
+
+import torch
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Decompress Image")
@@ -21,3 +22,11 @@ if __name__ == "__main__":
 
     decoder_path = fs.get_model_path(args.models_dir, args.resnet_model, args.quantize_levels, is_encoder=False)
     decoder = torch.load(decoder_path, map_location=args.device).eval()
+
+    image = CompressedImage.load(args.file)
+    latent = decompress(image)
+
+    with torch.no_grad():
+        image = decoder(latent)
+
+    print(image.shape)

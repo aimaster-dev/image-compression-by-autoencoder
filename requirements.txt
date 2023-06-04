@@ -3,3 +3,4 @@ torchmetrics==0.11.4
 torchvision==0.15.2
 Pillow==9.5.0
 matplotlib==3.7.1
+arithmetic-compressor===0.2

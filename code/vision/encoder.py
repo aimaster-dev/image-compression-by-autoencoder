@@ -14,19 +14,18 @@ class Encoder(nn.Module):
         config = utils.resnet_model_config(resnet_model_name)
         resnet = config.model(pretrained=True)
 
-        self.initial = nn.Sequential(
+        self.encoder = nn.Sequential(
             resnet.conv1,
             resnet.bn1,
             resnet.relu,
             resnet.maxpool,
-        )
-
-        self.resnet_encoder = nn.ModuleList([
             resnet.layer1,
             resnet.layer2,
             resnet.layer3,
             resnet.layer4
-        ])
+        )
+
+        self.reducer = nn.AvgPool2d(kernel_size=2)
 
     def add_noise(self, x: torch.Tensor) -> torch.Tensor:
         x = F.sigmoid(x)
@@ -37,10 +36,8 @@ class Encoder(nn.Module):
         return x
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        x = self.initial(x)
-
-        for layer in self.resnet_encoder:
-            x = layer(x)
+        x = self.encoder(x)
+        x = self.reducer(x)
 
         if self.training:
             x = self.add_noise(x)

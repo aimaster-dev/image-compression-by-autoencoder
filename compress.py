@@ -1,9 +1,11 @@
 import argparse
 from code import fs
-from PIL import Image
+from code.coding import CompressedImage, compress
 
+import numpy as np
 import torch
 import torchvision as tv
+from PIL import Image
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Compress Image")
@@ -25,14 +27,16 @@ if __name__ == "__main__":
     transform = tv.transforms.ToTensor()
 
     image = Image.open(args.image)
-    image = transform(image)
-    print(image.size)
+    image = np.asarray(image, dtype=np.uint8)
+    image = image.astype(np.float32) / 255.0
+    image = image.transpose(2, 0, 1)
+    image = torch.FloatTensor(image).unsqueeze(0).to(args.device)
 
     encoder = torch.load(encoder_path, map_location=args.device).eval()
-    image = image.unsqueeze(0)
-    image = encoder(image)
-    image = image.squeeze(0)
-    image = image.permute(1, 2, 0)
-    image = image.detach().numpy()
-    image = Image.fromarray(image)
-    image.save("compressed.png")
+
+    with torch.no_grad():
+        image = encoder(image)
+
+    image = image.squeeze(0).cpu()
+    compressed = compress(image, args.quantize_levels)
+    compressed.save(args.output)

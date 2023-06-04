@@ -2,8 +2,8 @@ import os
 
 import torch
 import torch.utils.data as td
-from PIL import Image
 import torchvision as tv
+from PIL import Image
 
 
 class ImageDataset(td.Dataset):
