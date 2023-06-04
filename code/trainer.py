@@ -55,7 +55,9 @@ class AutoEncoderTrainer:
         os.makedirs("train_logs", exist_ok=True)
 
         for epoch in range(self.epochs):
-            for x in tqdm.tqdm(loader, total=len(loader), desc=f"Epoch {epoch + 1}/{self.epochs}"):
+            bar = tqdm.tqdm(loader, total=len(loader), desc=f"Epoch {epoch + 1}/{self.epochs}")
+            mse_loss = None
+            for x in bar:
                 x = x.to(self.device)
                 with torch.no_grad():
                     latent = self.encoder(x)
@@ -69,6 +71,13 @@ class AutoEncoderTrainer:
                 optimizer.zero_grad()
                 loss.backward()
                 optimizer.step()
+
+                if mse_loss is None:
+                    mse_loss = loss.item()
+                else:
+                    mse_loss = 0.9 * mse_loss + 0.1 * loss.item()
+
+                bar.set_postfix(loss=mse_loss)
 
             if epoch % self.save_results_every == 0:
                 first_batch = next(iter(loader))
