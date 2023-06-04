@@ -12,7 +12,7 @@ if __name__ == "__main__":
     parser.add_argument("--output", type=str, required=True)
     parser.add_argument("--qb", type=int, required=True)
     parser.add_argument("--resnet-model", type=str, default="resnet18")
-    parser.add_argument("--models_dir", type=str, default="models")
+    parser.add_argument("--models-dir", type=str, default="models")
     parser.add_argument("--device", type=str, default="cuda" if torch.cuda.is_available() else "cpu")
     args = parser.parse_args()
 
@@ -24,7 +24,7 @@ if __name__ == "__main__":
 
     vector, shape = fs.load_compressed(args.file)
 
-    vector = decompress(vector, shape, args.quantize_levels)
+    vector = decompress(vector, shape, args.qb)
 
     decoder_path = fs.get_model_path(args.models_dir, args.resnet_model, args.qb, is_encoder=False)
     decoder = torch.load(decoder_path, map_location="cpu").to(args.device).eval()

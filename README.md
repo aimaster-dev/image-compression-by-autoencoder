@@ -26,47 +26,58 @@ Put downloaded models in `models` directory.
 
 ## Quick example:
 
-```shell
-# Compress the `baboon` image from assets/images directory
+[compress_all.sh](scripts/compress_all.sh) compresses all images from `assets/images` directory and saves them
+in `assets/compressed` directory.
 
-python compress.py \
-  --image=assets/images/baboon.png \
-  --models_dir=models \
-  --latent_dim=128 \
-  --device=cuda \
-  --quantize_levels=2 \
-  --compressed_path=compressed.bin
-  
-# Decompress the compressed image
-python decompress.py \
-  --compressed_path=compressed.bin \
-  --models_dir=models \
-  --latent_dim=128 \
-  --device=cuda \
-  --quantize_levels=2 \
-  --decompressed_path=decompressed.png
+`compress_all.sh` takes 3 arguments:
+
+* `qb` - number of quantization levels
+* `resnet-model` - resnet model architecture
+* `device` - torch device to evaluate on
+
+```shell
+# Compress all images from assets/images directory
+bash scripts/compress_all.sh 8 resnet18 cpu
+```
+
+[decompress_all.sh](./scripts/decompress_all.sh) decompresses all images from `assets/compressed` directory and saves
+them in `assets/decompressed` directory.
+
+`decompress_all.sh` takes 3 arguments:
+
+* `qb` - number of quantization levels
+* `resnet-model` - resnet model architecture
+* `device` - torch device to evaluate on
+
+```shell
+# Decompress all images from assets/compressed directory
+bash scripts/decompress_all.sh 8 resnet18 cpu
 ```
 
 ## Compression
 
 ```shell
+# Compress the `baboon` image from assets/images directory
 python compress.py \
-  --root [path to images] \
-  --model_path [path to model] \
-  --device [torch device to train on] \
-  --quantize_levels [number of quantization levels] \
-  --compressed_path [path to save compressed image]
+  --image=assets/images/baboon.png \
+  --output=assets/compressed/baboon.bin \
+  --models_dir=models \
+  --resnet-model=resnet18 \
+  --qb=8 \
+  --device=cuda
 ```
 
 ## Decompression
 
 ```shell
+# Decompress the compressed image
 python decompress.py \
-  --compressed_path [path to compressed image] \
-  --model_path [path to model] \
-  --device [torch device to train on] \
-  --quantize_levels [number of quantization levels] \
-  --decompressed_path [path to save decompressed image]
+  --file=assets/compressed/baboon.bin \
+  --output=assets/decompressed/baboon.png \
+  --qb=8 \
+  --resnet-model=resnet18 \
+  --models_dir=models \
+  --device=cuda
 ```
 
 ## Training from scratch
@@ -74,13 +85,13 @@ python decompress.py \
 ```shell
 python train.py \
   --root [path to images] \
+  --test-root [path to test images] \
   --resnet-model [resnet model architecture] \
+  --qb [number of quantization levels] \
   --epochs [number of epochs] \
   --batch_size [batch size] \
   --lr [learning rate] \
   --device [torch device to train on] \
-  --vgg_alpha [weight of VGG loss] \
-  --quantize_levels [number of quantization levels] \
   --save_results_every [save results every n epochs] \
   --save_models_dir [path to save models]
 ```

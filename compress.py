@@ -12,7 +12,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Compress Image")
     parser.add_argument("--image", type=str, required=True)
     parser.add_argument("--output", type=str, required=True)
-    parser.add_argument("--models_dir", type=str, default="models")
+    parser.add_argument("--models-dir", type=str, default="models")
     parser.add_argument("--resnet-model", type=str, default="resnet18")
     parser.add_argument("--qb", type=int, required=True)
     parser.add_argument("--device", type=str, default="cuda" if torch.cuda.is_available() else "cpu")
@@ -39,5 +39,5 @@ if __name__ == "__main__":
         image = encoder(image)
 
     image = image.squeeze(0).cpu()
-    compressed, shape = compress(image, args.quantize_levels)
+    compressed, shape = compress(image, args.qb)
     fs.save_compressed(compressed, shape, args.output)
