@@ -1,8 +1,10 @@
 import argparse
 import code.fs as fs
-from code.coding import CompressedImage, decompress
+from code.coding import decompress
 
+import numpy as np
 import torch
+from PIL import Image
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Decompress Image")
@@ -20,13 +22,19 @@ if __name__ == "__main__":
 
     print()
 
+    vector, shape = fs.load_compressed(args.file)
+
+    vector = decompress(vector, shape, args.quantize_levels)
+
     decoder_path = fs.get_model_path(args.models_dir, args.resnet_model, args.quantize_levels, is_encoder=False)
     decoder = torch.load(decoder_path, map_location=args.device).eval()
 
-    image = CompressedImage.load(args.file)
-    latent = decompress(image)
-
     with torch.no_grad():
-        image = decoder(latent)
+        image = decoder(vector)
 
-    print(image.shape)
+    image = image.squeeze(0).cpu().numpy().transpose(1, 2, 0)
+    image = image * 255.0
+    image = image.astype(np.uint8)
+
+    image = Image.fromarray(image)
+    image.save(args.output)

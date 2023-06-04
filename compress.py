@@ -1,6 +1,7 @@
 import argparse
+import pickle
 from code import fs
-from code.coding import CompressedImage, compress
+from code.coding import compress
 
 import numpy as np
 import torch
@@ -38,5 +39,5 @@ if __name__ == "__main__":
         image = encoder(image)
 
     image = image.squeeze(0).cpu()
-    compressed = compress(image, args.quantize_levels)
-    compressed.save(args.output)
+    compressed, shape = compress(image, args.quantize_levels)
+    fs.save_compressed(compressed, shape, args.output)

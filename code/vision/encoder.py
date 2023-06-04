@@ -25,8 +25,6 @@ class Encoder(nn.Module):
             resnet.layer4
         )
 
-        self.reducer = nn.AvgPool2d(kernel_size=2)
-
     def add_noise(self, x: torch.Tensor) -> torch.Tensor:
         x = F.sigmoid(x)
         gaussian_noise = torch.rand_like(x) * 0.5 - 0.5
@@ -37,7 +35,6 @@ class Encoder(nn.Module):
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         x = self.encoder(x)
-        x = self.reducer(x)
 
         if self.training:
             x = self.add_noise(x)

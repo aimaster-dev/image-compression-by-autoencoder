@@ -19,8 +19,8 @@ Models were trained on ImageNet dataset subset (20000 images).
 Here are the links to download the pretrained models:
 _B = number of quantization levels_
 
-* [B=2, resnet18]()
-* [B=4, resnet18]()
+* [B=2, resnet18](https://drive.google.com/drive/folders/1FaeWzeRW3BMqqZwGsHUjhf7PuAOsiY6E?usp=sharing)
+* [B=8, resnet18](https://drive.google.com/drive/folders/1fYDc0e43cUR7xsIYatpz8fdJ_6KMJmSs?usp=sharing)
 
 Put downloaded models in `models` directory.
 
@@ -88,6 +88,3 @@ python train.py \
 ## Results
 
 ### Compression
-
-| Original image size | Compressed image size (B=2, L=128) | Compressed image size (B=4, L=256) |
-|---------------------|------------------------------------|------------------------------------|
