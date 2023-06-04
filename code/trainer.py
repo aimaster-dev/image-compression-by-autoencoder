@@ -3,7 +3,6 @@ import shutil
 from code.vision import Decoder, Encoder
 from code.vision.dataset import ImageDataset
 from code.vision.utils import vgg_loss
-from itertools import chain
 
 import matplotlib.pyplot as plt
 import torch
@@ -35,7 +34,7 @@ class AutoEncoderTrainer:
 
         self.encoder = Encoder(
             resnet_model_name=resnet_model_name, quantize_levels=quantize_levels
-        ).to(device).train()
+        ).to(device).eval()
 
         self.decoder = Decoder(
             resnet_model_name=resnet_model_name
@@ -43,10 +42,7 @@ class AutoEncoderTrainer:
 
     def train(self):
         mse = torch.nn.MSELoss()
-        optimizer = torch.optim.Adam(
-            chain(self.encoder.parameters(), self.decoder.parameters()),
-            lr=self.lr
-        )
+        optimizer = torch.optim.Adam(self.decoder.parameters(), lr=self.lr)
         dataset = ImageDataset(self.root, transform=tv.transforms.Compose([
             tv.transforms.Resize((512, 512)),
             tv.transforms.ToTensor(),
@@ -60,7 +56,9 @@ class AutoEncoderTrainer:
         for epoch in range(self.epochs):
             for x in loader:
                 x = x.to(self.device)
-                latent = self.encoder(x)
+                with torch.no_grad():
+                    latent = self.encoder(x)
+
                 x_hat = self.decoder(latent)
 
                 loss = mse(x_hat, x)

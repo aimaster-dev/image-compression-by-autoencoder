@@ -2,7 +2,6 @@ from code.vision import utils
 
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
 
 
 class Encoder(nn.Module):
@@ -26,11 +25,10 @@ class Encoder(nn.Module):
         )
 
     def add_noise(self, x: torch.Tensor) -> torch.Tensor:
-        x = F.sigmoid(x)
+        x = torch.clamp(x, 0.0, 1.0)
         gaussian_noise = torch.rand_like(x) * 0.5 - 0.5
         noise = gaussian_noise * 2 ** -self.quantize_levels
         x = x + noise
-        x = torch.log(x / (1 - x))
         return x
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
