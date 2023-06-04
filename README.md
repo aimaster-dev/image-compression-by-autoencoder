@@ -25,7 +25,7 @@ Model represents a variational auto-encoder with residual blocks and skip connec
 
 ## Download pretrained models
 
-Models were trained on ImageNet dataset subset (20000 images).
+Models were trained on [130k Images (512x512) - Universal Image Embeddings](https://www.kaggle.com/datasets/rhtsingh/130k-images-512x512-universal-image-embeddings) dataset from Kaggle.
 
 Here are the links to download the pretrained models:
 _B = number of quantization levels_
