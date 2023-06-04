@@ -78,6 +78,8 @@ class AutoEncoderTrainer:
             bar = tqdm.tqdm(loader, total=len(loader), desc=f"Epoch {epoch + 1}/{self.epochs}")
             mse_loss = None
             for batch_num, x in enumerate(bar):
+                self.encoder.train()
+                self.decoder.train()
                 x = x.to(self.device)
                 latent = self.encoder(x)
                 x_hat = self.decoder(latent)
@@ -98,6 +100,8 @@ class AutoEncoderTrainer:
                 bar.set_postfix(loss=mse_loss)
 
                 if batch_num % self.save_results_every == 0:
+                    self.encoder.eval()
+                    self.decoder.eval()
                     first_batch = next(iter(test_loader))
                     with torch.no_grad():
                         first_batch = first_batch.to(self.device)
