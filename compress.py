@@ -14,7 +14,7 @@ if __name__ == "__main__":
     parser.add_argument("--output", type=str, required=True)
     parser.add_argument("--models_dir", type=str, default="models")
     parser.add_argument("--resnet-model", type=str, default="resnet18")
-    parser.add_argument("--quantize_levels", type=int, required=True)
+    parser.add_argument("--qb", type=int, required=True)
     parser.add_argument("--device", type=str, default="cuda" if torch.cuda.is_available() else "cpu")
     args = parser.parse_args()
 
@@ -24,7 +24,7 @@ if __name__ == "__main__":
 
     print()
 
-    encoder_path = fs.get_model_path(args.models_dir, args.resnet_model, args.quantize_levels, is_encoder=True)
+    encoder_path = fs.get_model_path(args.models_dir, args.resnet_model, args.qb, is_encoder=True)
     transform = tv.transforms.ToTensor()
 
     image = Image.open(args.image)
@@ -33,7 +33,7 @@ if __name__ == "__main__":
     image = image.transpose(2, 0, 1)
     image = torch.FloatTensor(image).unsqueeze(0).to(args.device)
 
-    encoder = torch.load(encoder_path, map_location=args.device).eval()
+    encoder = torch.load(encoder_path, map_location="cpu").to(args.device).eval()
 
     with torch.no_grad():
         image = encoder(image)

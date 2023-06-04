@@ -5,11 +5,8 @@ import torch.nn as nn
 
 
 class Encoder(nn.Module):
-    def __init__(self, resnet_model_name: str, quantize_levels: int):
+    def __init__(self, resnet_model_name: str):
         super().__init__()
-        self.resnet_model_name = resnet_model_name
-        self.quantize_levels = quantize_levels
-
         config = utils.resnet_model_config(resnet_model_name)
         resnet = config.model(pretrained=True)
 
@@ -24,19 +21,11 @@ class Encoder(nn.Module):
             resnet.layer4
         )
 
-    def add_noise(self, x: torch.Tensor) -> torch.Tensor:
-        x = torch.clamp(x, 0.0, 1.0)
-        gaussian_noise = torch.rand_like(x) * 0.5 - 0.5
-        noise = gaussian_noise * 2 ** -self.quantize_levels
-        x = x + noise
-        return x
+        self.pool = nn.AvgPool2d(kernel_size=2)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         x = self.encoder(x)
-
-        if self.training:
-            x = self.add_noise(x)
-
+        x = self.pool(x)
         return x
 
 
