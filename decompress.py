@@ -30,6 +30,7 @@ if __name__ == "__main__":
     decoder = torch.load(decoder_path, map_location="cpu").to(args.device).eval()
 
     with torch.no_grad():
+        vector = vector.to(args.device)
         image = decoder(vector)
 
     image = image.squeeze(0).cpu().numpy().transpose(1, 2, 0)

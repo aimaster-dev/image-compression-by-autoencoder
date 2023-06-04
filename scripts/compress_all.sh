@@ -7,7 +7,7 @@ DEVICE=$3
 for file in $(ls -1 assets/images); do
   python compress.py \
     --image=assets/images/$file \
-    --output=assets/compressed/${file%.*}.bin \
+    --output=assets/compressed/B=$QB/${file%.*}.bin \
     --models-dir=models \
     --qb=$QB \
     --resnet-model=$RESNET \

@@ -1,9 +1,8 @@
 import argparse
 import warnings
+from code.trainer import AutoEncoderTrainer
 
 import torch
-
-from code.trainer import AutoEncoderTrainer
 
 warnings.filterwarnings("ignore")
 

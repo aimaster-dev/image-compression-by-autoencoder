@@ -98,4 +98,27 @@ python train.py \
 
 ## Results
 
-### Compression
+### Compression size comparison
+
+```shell
+╰─ du -h assets/compressed/*
+# 60K    assets/compressed/baboon.bin
+# 60K    assets/compressed/lena.bin
+# 60K    assets/compressed/peppers.bin
+```
+
+```shell
+╰─ du -h assets/images/*     
+  
+# 624K    assets/images/baboon.png
+# 504K    assets/images/lena.png
+# 528K    assets/images/peppers.png
+```
+
+### Images
+
+|              Original               |                   B=2                   |                    B=8                    |
+|:-----------------------------------:|:---------------------------------------:|:-----------------------------------------:|
+| ![baboon](assets/images/baboon.png) | ![baboon](assets/compressed/baboon.png) | ![baboon](assets/decompressed/baboon.png) |
+|  ![lena](assets/images/lena.png)    |   ![lena](assets/compressed/lena.png)   |   ![lena](assets/decompressed/lena.png)   |
+| ![peppers](assets/images/peppers.png) | ![peppers](assets/compressed/peppers.png) | ![peppers](assets/decompressed/peppers.png) |

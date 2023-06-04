@@ -8,7 +8,7 @@ from arithmetic_compressor.models import SimpleAdaptiveModel
 
 
 def quantize(vector: torch.Tensor, qb: int) -> torch.Tensor:
-    return (vector * (2 ** qb) + 0.5).long()
+    return (vector * (2 ** qb) + 0.5).to(torch.int64)
 
 
 def dequantize(vector: torch.Tensor, qb: int) -> torch.Tensor:
@@ -33,7 +33,7 @@ def compress(vector: torch.Tensor, qb: int):
 
     shape = vector.shape
     vector = vector.flatten()
-    vector = F.sigmoid(vector)
+    vector = torch.clamp(vector, 0.0, 1.0)
     vector = quantize(vector, qb)
     vector = vector.tolist()
 
