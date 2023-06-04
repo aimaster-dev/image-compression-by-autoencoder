@@ -1,4 +1,6 @@
-# Image compression using variational auto-encoder
+# Image compression using neural auto-encoder and quantization
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 This project is a simple implementation of auto-encoder neural network for image compression.
 The auto-encoder neural network is trained on the ImageNet dataset. The trained model is then used to compress and
@@ -25,7 +27,9 @@ Model represents a variational auto-encoder with residual blocks and skip connec
 
 ## Download pretrained models
 
-Models were trained on [130k Images (512x512) - Universal Image Embeddings](https://www.kaggle.com/datasets/rhtsingh/130k-images-512x512-universal-image-embeddings) dataset from Kaggle.
+Models were trained
+on [130k Images (512x512) - Universal Image Embeddings](https://www.kaggle.com/datasets/rhtsingh/130k-images-512x512-universal-image-embeddings)
+dataset from Kaggle.
 
 Here are the links to download the pretrained models:
 _B = number of quantization levels_
@@ -114,19 +118,28 @@ python train.py \
 
 |                Image                 | Original (.png) |  Jpeg  |  B=2  |  B=8  |
 |:------------------------------------:|:---------------:|:------:|:-----:|:-----:|
-|  [baboon](assets/images/baboon.png)  |     624 KB      | 100 KB | 76 KB | 76 KB |
-|    [lena](assets/images/lena.png)    |     504 KB      | 62 KB  | 76 KB | 76 KB |
-| [peppers](assets/images/peppers.png) |     528 KB      | 56 KB  | 76 KB | 76 KB |
+|  [baboon](assets/images/baboon.png)  |     624 KB      | 100 KB | 20 KB | 76 KB |
+|    [lena](assets/images/lena.png)    |     504 KB      | 62 KB  | 20 KB | 76 KB |
+| [peppers](assets/images/peppers.png) |     528 KB      | 56 KB  | 20 KB | 76 KB |
 
 ### Images
 
-|               Original                |                    B=2                    |                       B=8                       |
-|:-------------------------------------:|:-----------------------------------------:|:-----------------------------------------------:|
-|  ![baboon](assets/images/baboon.png)  |  ![baboon](assets/compressed/baboon.png)  |  ![baboon](assets/decompressed/B=8/baboon.png)  |
-|    ![lena](assets/images/lena.png)    |    ![lena](assets/compressed/lena.png)    |    ![lena](assets/decompressed/B=8/lena.png)    |
-| ![peppers](assets/images/peppers.png) | ![peppers](assets/compressed/peppers.png) | ![peppers](assets/decompressed/B=8/peppers.png) |
+|               Original                |                       B=2                       |                       B=8                       |
+|:-------------------------------------:|:-----------------------------------------------:|:-----------------------------------------------:|
+|  ![baboon](assets/images/baboon.png)  |  ![baboon](assets/decompressed/B=2/baboon.png)  |  ![baboon](assets/decompressed/B=8/baboon.png)  |
+|    ![lena](assets/images/lena.png)    |    ![lena](assets/decompressed/B=2/lena.png)    |    ![lena](assets/decompressed/B=8/lena.png)    |
+| ![peppers](assets/images/peppers.png) | ![peppers](assets/decompressed/B=2/peppers.png) | ![peppers](assets/decompressed/B=8/peppers.png) |
 
 ### Graphs
+
+PSNR: _Peak signal-to-noise ratio_
+![psnr](assets/graphs/psnr.png)
+
+BPP: _Bits per pixel_
+![bpp](assets/graphs/bpp.png)
+
+Quality comparison:
+![quality](assets/graphs/quality-comparison.png)
 
 ## Notebooks
 
