@@ -11,6 +11,7 @@ warnings.filterwarnings("ignore")
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Train AutoEncoder")
     parser.add_argument("--root", type=str, default="data")
+    parser.add_argument("--test-root", type=str, default="test_root")
     parser.add_argument("--resnet-model", type=str, default="resnet34",
                         choices=["resnet18", "resnet34", "resnet50", "resnet101", "resnet152"])
     parser.add_argument("--epochs", type=int, default=100)
@@ -31,6 +32,7 @@ if __name__ == "__main__":
 
     trainer = AutoEncoderTrainer(
         root=args.root,
+        test_root=args.test_root,
         resnet_model_name=args.resnet_model,
         quantize_levels=args.quantize_levels,
         epochs=args.epochs,
@@ -39,16 +41,8 @@ if __name__ == "__main__":
         device=args.device,
         vgg_alpha=args.vgg_alpha,
         save_results_every=args.save_results_every,
+        save_models_dir=args.save_models_dir
     )
 
-    encoder, decoder = trainer.train()
+    trainer.train()
 
-    os.makedirs(args.save_models_dir, exist_ok=True)
-    torch.save(
-        encoder,
-        fs.get_model_path(args.save_models_dir, args.resnet_model, args.quantize_levels, is_encoder=True)
-    )
-    torch.save(
-        decoder,
-        fs.get_model_path(args.save_models_dir, args.resnet_model, args.quantize_levels, is_encoder=False)
-    )

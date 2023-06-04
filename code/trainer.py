@@ -1,3 +1,4 @@
+import code.fs as fs
 import os
 import shutil
 from code.vision import Decoder, Encoder
@@ -15,6 +16,7 @@ class AutoEncoderTrainer:
     def __init__(
             self,
             root: str,
+            test_root: str,
             resnet_model_name: str,
             quantize_levels: int,
             epochs: int,
@@ -23,14 +25,19 @@ class AutoEncoderTrainer:
             device: torch.device,
             vgg_alpha: float = 0.0,
             save_results_every: int = 10,
+            save_models_dir: str = "models"
     ):
         self.root = root
+        self.test_root = test_root
+        self.resnet_model_name = resnet_model_name
+        self.quantize_levels = quantize_levels
         self.epochs = epochs
         self.batch_size = batch_size
         self.lr = lr
         self.device = device
         self.vgg_alpha = vgg_alpha
         self.save_results_every = save_results_every
+        self.save_models_dir = save_models_dir
         self._vgg = None if vgg_alpha == 0.0 else tv.models.vgg16(pretrained=True).eval().to(device)
 
         self.encoder = Encoder(
@@ -44,11 +51,24 @@ class AutoEncoderTrainer:
     def train(self):
         mse = torch.nn.MSELoss()
         optimizer = torch.optim.Adam(self.decoder.parameters(), lr=self.lr)
-        dataset = ImageDataset(self.root, transform=tv.transforms.Compose([
-            tv.transforms.Resize((512, 512)),
-            tv.transforms.ToTensor(),
-        ]))
+
+        dataset = ImageDataset(
+            self.root,
+            transform=tv.transforms.Compose([
+                tv.transforms.Resize((512, 512)),
+                tv.transforms.ToTensor(),
+            ]))
+
+        test_images = ImageDataset(
+            self.test_root,
+            transform=tv.transforms.Compose([
+                tv.transforms.Resize((512, 512)),
+                tv.transforms.ToTensor(),
+            ])
+        )
+
         loader = td.DataLoader(dataset, batch_size=self.batch_size, shuffle=True)
+        test_loader = td.DataLoader(test_images, batch_size=self.batch_size, shuffle=False)
 
         # Clear train_logs directory
         shutil.rmtree("train_logs", ignore_errors=True)
@@ -57,7 +77,7 @@ class AutoEncoderTrainer:
         for epoch in range(self.epochs):
             bar = tqdm.tqdm(loader, total=len(loader), desc=f"Epoch {epoch + 1}/{self.epochs}")
             mse_loss = None
-            for x in bar:
+            for batch_num, x in enumerate(bar):
                 x = x.to(self.device)
                 with torch.no_grad():
                     latent = self.encoder(x)
@@ -79,26 +99,37 @@ class AutoEncoderTrainer:
 
                 bar.set_postfix(loss=mse_loss)
 
-            if epoch % self.save_results_every == 0:
-                first_batch = next(iter(loader))
-                with torch.no_grad():
-                    first_batch = first_batch.to(self.device)
-                    latent = self.encoder(first_batch)
-                    x_hat = self.decoder(latent)
+                if batch_num % self.save_results_every == 0:
+                    first_batch = next(iter(test_loader))
+                    with torch.no_grad():
+                        first_batch = first_batch.to(self.device)
+                        latent = self.encoder(first_batch)
+                        x_hat = self.decoder(latent)
 
-                limit = min(len(first_batch), 8)
-                fig, axes = plt.subplots(2, limit, figsize=(limit * 2, 4))
-                for i in range(limit):
-                    axes[0, i].axis("off")
-                    axes[1, i].axis("off")
-                    axes[0, i].imshow(first_batch[i].cpu().permute(1, 2, 0))
-                    axes[1, i].imshow(x_hat[i].cpu().permute(1, 2, 0))
+                    limit = min(len(first_batch), 8)
+                    fig, axes = plt.subplots(2, limit, figsize=(limit * 2, 4))
+                    for i in range(limit):
+                        axes[0, i].axis("off")
+                        axes[1, i].axis("off")
+                        axes[0, i].imshow(first_batch[i].cpu().permute(1, 2, 0))
+                        axes[1, i].imshow(x_hat[i].cpu().permute(1, 2, 0))
 
-                plt.savefig(f"train_logs/epoch_{epoch}.png")
+                    plt.savefig(f"train_logs/epoch={epoch}_batch={batch_num}.png")
+
+            self.save_checkpoint()
 
             print(f"Epoch: {epoch}, Loss: {loss.item()}")
 
-        return self.encoder, self.decoder
+    def save_checkpoint(self):
+        os.makedirs(self.save_models_dir, exist_ok=True)
+        torch.save(
+            self.encoder,
+            fs.get_model_path(self.save_models_dir, self.resnet_model_name, self.quantize_levels, is_encoder=True)
+        )
+        torch.save(
+            self.decoder,
+            fs.get_model_path(self.save_models_dir, self.resnet_model_name, self.quantize_levels, is_encoder=False)
+        )
 
 
 __all__ = [
