@@ -4,6 +4,17 @@ This project is a simple implementation of auto-encoder neural network for image
 The auto-encoder neural network is trained on the ImageNet dataset. The trained model is then used to compress and
 decompress the images.
 
+## Navigation:
+
+* [Model architecture](#model-architecture)
+* [Download pretrained models](#download-pretrained-models)
+* [Quick start](#quick-start)
+* [Compression](#compression)
+* [Decompression](#decompression)
+* [Training from scratch](#training-from-scratch)
+* [Results](#results)
+* [Notebooks](#notebooks)
+
 ## Model architecture
 
 Model represents a variational auto-encoder with residual blocks and skip connections.
@@ -24,7 +35,7 @@ _B = number of quantization levels_
 
 Put downloaded models in `models` directory.
 
-## Quick example:
+## Quick start
 
 [compress_all.sh](scripts/compress_all.sh) compresses all images from `assets/images` directory and saves them
 in `assets/compressed` directory.
@@ -98,27 +109,25 @@ python train.py \
 
 ## Results
 
-### Compression size comparison
+### Size comparison
 
-```shell
-╰─ du -h assets/compressed/*
-# 60K    assets/compressed/baboon.bin
-# 60K    assets/compressed/lena.bin
-# 60K    assets/compressed/peppers.bin
-```
-
-```shell
-╰─ du -h assets/images/*     
-  
-# 624K    assets/images/baboon.png
-# 504K    assets/images/lena.png
-# 528K    assets/images/peppers.png
-```
+|                Image                 | Original (.png) |  Jpeg  |  B=2  |  B=8  |
+|:------------------------------------:|:---------------:|:------:|:-----:|:-----:|
+|  [baboon](assets/images/baboon.png)  |     624 KB      | 100 KB | 76 KB | 76 KB |
+|    [lena](assets/images/lena.png)    |     504 KB      | 62 KB  | 76 KB | 76 KB |
+| [peppers](assets/images/peppers.png) |     528 KB      | 56 KB  | 76 KB | 76 KB |
 
 ### Images
 
-|              Original               |                   B=2                   |                    B=8                    |
-|:-----------------------------------:|:---------------------------------------:|:-----------------------------------------:|
-| ![baboon](assets/images/baboon.png) | ![baboon](assets/compressed/baboon.png) | ![baboon](assets/decompressed/baboon.png) |
-|  ![lena](assets/images/lena.png)    |   ![lena](assets/compressed/lena.png)   |   ![lena](assets/decompressed/lena.png)   |
-| ![peppers](assets/images/peppers.png) | ![peppers](assets/compressed/peppers.png) | ![peppers](assets/decompressed/peppers.png) |
+|               Original                |                    B=2                    |                       B=8                       |
+|:-------------------------------------:|:-----------------------------------------:|:-----------------------------------------------:|
+|  ![baboon](assets/images/baboon.png)  |  ![baboon](assets/compressed/baboon.png)  |  ![baboon](assets/decompressed/B=8/baboon.png)  |
+|    ![lena](assets/images/lena.png)    |    ![lena](assets/compressed/lena.png)    |    ![lena](assets/decompressed/B=8/lena.png)    |
+| ![peppers](assets/images/peppers.png) | ![peppers](assets/compressed/peppers.png) | ![peppers](assets/decompressed/B=8/peppers.png) |
+
+### Graphs
+
+## Notebooks
+
+* [Kaggle training notebook](notebooks/kaggle-cuda-training.ipynb)
+* [Analysis notebook](notebooks/analysis.ipynb)
