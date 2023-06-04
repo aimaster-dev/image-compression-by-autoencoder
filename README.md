@@ -132,13 +132,14 @@ python train.py \
 
 ### Graphs
 
-PSNR: _Peak signal-to-noise ratio_
+#### PSNR: _Peak signal-to-noise ratio_
+
 ![psnr](assets/graphs/psnr.png)
 
-BPP: _Bits per pixel_
+#### BPP: _Bits per pixel_
 ![bpp](assets/graphs/bpp.png)
 
-Quality comparison:
+#### Quality comparison:
 ![quality](assets/graphs/quality-comparison.png)
 
 ## Notebooks
