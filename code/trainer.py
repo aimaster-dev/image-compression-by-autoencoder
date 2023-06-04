@@ -24,7 +24,8 @@ class AutoEncoderTrainer:
             lr: float,
             device: torch.device,
             save_results_every: int = 10,
-            save_models_dir: str = "models"
+            save_models_dir: str = "models",
+            use_checkpoint: bool = False,
     ):
         self.root = root
         self.test_root = test_root
@@ -41,6 +42,13 @@ class AutoEncoderTrainer:
             resnet_model_name=resnet_model_name,
             qb=qb
         ).to(device).train()
+
+        if use_checkpoint:
+            encoder_path = fs.get_model_path(self.save_models_dir, self.resnet_model_name, self.qb, is_encoder=True)
+            decoder_path = fs.get_model_path(self.save_models_dir, self.resnet_model_name, self.qb, is_encoder=False)
+
+            self.model.encoder = torch.load(encoder_path).to(device).train()
+            self.model.decoder = torch.load(decoder_path).to(device).train()
 
     def train(self):
         mse = torch.nn.MSELoss()
