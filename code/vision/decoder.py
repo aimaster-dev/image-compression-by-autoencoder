@@ -46,8 +46,8 @@ class Decoder(nn.Module):
             self.decoder.append(block)
 
         self.final = nn.Sequential(
-            TransposedBlock(self.channels[0], 32, kernel_size=3, stride=2),
-            nn.ConvTranspose2d(32, 3, kernel_size=3, stride=2),
+            TransposedBlock(self.channels[0], 32, kernel_size=3, stride=2, output_padding=0),
+            nn.ConvTranspose2d(32, 3, kernel_size=3, stride=2, output_padding=1),
             nn.Sigmoid()
         )
 
