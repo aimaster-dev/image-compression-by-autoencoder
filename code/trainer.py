@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 import torch
 import torch.utils.data as td
 import torchvision as tv
+import tqdm
 
 
 class AutoEncoderTrainer:
@@ -54,7 +55,7 @@ class AutoEncoderTrainer:
         os.makedirs("train_logs", exist_ok=True)
 
         for epoch in range(self.epochs):
-            for x in loader:
+            for x in tqdm.tqdm(loader, total=len(loader), desc=f"Epoch {epoch + 1}/{self.epochs}"):
                 x = x.to(self.device)
                 with torch.no_grad():
                     latent = self.encoder(x)
