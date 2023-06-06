@@ -10,6 +10,7 @@ decompress the images.
 
 * [Model architecture](#model-architecture)
 * [Download pretrained models](#download-pretrained-models)
+* [Quantization](#quantization)
 * [Quick start](#quick-start)
 * [Compression](#compression)
 * [Decompression](#decompression)
@@ -24,6 +25,7 @@ Model represents a variational auto-encoder with residual blocks and skip connec
 * Encoder: _ResNet-18 architecture with fully connected layers_
 * Decoder: _ResNet-18 architecture with transposed convolution layers_
 * Loss: _VGG loss + MSE loss_
+* Optimizer: _Adam optimizer_
 
 ## Download pretrained models
 
@@ -38,6 +40,22 @@ _B = number of quantization levels_
 * [B=8, resnet18](https://drive.google.com/drive/folders/1fYDc0e43cUR7xsIYatpz8fdJ_6KMJmSs?usp=sharing)
 
 Put downloaded models in `models` directory.
+
+## Quantization
+
+Model outputs feature maps with 512 channels and 8 x 8 spatial dimensions. Then the feature map are flattened and
+become a vector of size 32768. The vector is then quantized into `B` quantization levels.
+
+### Train quantization
+In training phase `noise` is appended to the input image. The `noise` is sampled from N(-0.5, 0.5) and then noise scaled by
+`B` quantization levels. So the final noise vector is N(-0.5, 0.5) * 2 ** (-B).
+
+### Inference quantization
+In inference mode vector is quantized using `torch.clamp(0, 1)` and then scaled by `B` quantization levels.
+So the final quantized vector is 
+```python
+torch.clamp(vector, 0, 1) * 2 ** B + 0.5
+```
 
 ## Quick start
 
@@ -71,6 +89,13 @@ bash scripts/decompress_all.sh 8 resnet18 cpu
 
 ## Compression
 
+In compression phase the encoder encodes the image into a vector of size 32768. Then the vector is quantized into 
+`B` quantization levels. And finally the quantized vector is compressed using `Adaptive Arithmetic Coding`.
+
+Final compressed file consists of:
+* `vector` - quantized vector
+* `shape` - feature map shape
+
 ```shell
 # Compress the `baboon` image from assets/images directory
 python compress.py \
@@ -83,6 +108,11 @@ python compress.py \
 ```
 
 ## Decompression
+
+In decompression phase the compressed file is decompressed using `Adaptive Arithmetic Coding`. Then the decompressed
+vector is dequantized and decoded by the decoder. The decoder outputs the decompressed image.
+
+dequantized vector = `vector / (2 ** qb)`
 
 ```shell
 # Decompress the compressed image
@@ -114,14 +144,6 @@ python train.py \
 
 ## Results
 
-### Size comparison
-
-|                Image                 | Original (.png) |  Jpeg  |  B=2  |  B=8  |
-|:------------------------------------:|:---------------:|:------:|:-----:|:-----:|
-|  [baboon](assets/images/baboon.png)  |     624 KB      | 100 KB | 20 KB | 76 KB |
-|    [lena](assets/images/lena.png)    |     504 KB      | 62 KB  | 20 KB | 76 KB |
-| [peppers](assets/images/peppers.png) |     528 KB      | 56 KB  | 20 KB | 76 KB |
-
 ### Images
 
 |               Original                |                       B=2                       |                       B=8                       |
@@ -137,9 +159,11 @@ python train.py \
 ![psnr](assets/graphs/psnr.png)
 
 #### BPP: _Bits per pixel_
+
 ![bpp](assets/graphs/bpp.png)
 
 #### Quality comparison:
+
 ![quality](assets/graphs/quality-comparison.png)
 
 ## Notebooks
