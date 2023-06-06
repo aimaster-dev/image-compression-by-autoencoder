@@ -47,16 +47,21 @@ Model outputs feature maps with 512 channels and 8 x 8 spatial dimensions. Then 
 become a vector of size 32768. The vector is then quantized into `B` quantization levels.
 
 ### Train quantization
-In training phase `noise` is appended to the input image. The `noise` is sampled from N(-0.5, 0.5) and then noise scaled by
-`B` quantization levels. So the final noise vector is 
+
+In training phase `noise` is appended to the input image. The `noise` is sampled from N(-0.5, 0.5) and then noise scaled
+by
+`B` quantization levels. So the final noise vector is
+
 ```python
 scale = 2 ** -B
 noise = (torch.randn(n) * 0.5 - 0.5) * scale
 ```
 
 ### Inference quantization
+
 In inference mode vector is quantized using `torch.clamp(0, 1)` and then scaled by `B` quantization levels.
-So the final quantized vector is 
+So the final quantized vector is
+
 ```python
 torch.clamp(vector, 0, 1) * 2 ** B + 0.5
 ```
@@ -93,10 +98,11 @@ bash scripts/decompress_all.sh 8 resnet18 cpu
 
 ## Compression
 
-In compression phase the encoder encodes the image into a vector of size 32768. Then the vector is quantized into 
+In compression phase the encoder encodes the image into a vector of size 32768. Then the vector is quantized into
 `B` quantization levels. And finally the quantized vector is compressed using `Adaptive Arithmetic Coding`.
 
 Final compressed file consists of:
+
 * `vector` - quantized vector
 * `shape` - feature map shape
 
@@ -150,25 +156,25 @@ python train.py \
 
 ### Images
 
-|               Original                |                       B=2                       |                       B=8                       |
-|:-------------------------------------:|:-----------------------------------------------:|:-----------------------------------------------:|
-|  ![baboon](assets/images/baboon.png)  |  ![baboon](assets/decompressed/B=2/baboon.png)  |  ![baboon](assets/decompressed/B=8/baboon.png)  |
-|    ![lena](assets/images/lena.png)    |    ![lena](assets/decompressed/B=2/lena.png)    |    ![lena](assets/decompressed/B=8/lena.png)    |
-| ![peppers](assets/images/peppers.png) | ![peppers](assets/decompressed/B=2/peppers.png) | ![peppers](assets/decompressed/B=8/peppers.png) |
+#### B=2
 
-### Graphs
+| Jpeg QF |                   Jpeg                   |                  Auto-Encoder                   |
+|--------:|:----------------------------------------:|:-----------------------------------------------:|
+|      12 |  ![baboon](assets/jpegs/B=2/baboon.jpg)  |  ![baboon](assets/decompressed/B=2/baboon.png)  |
+|      35 |    ![lena](assets/jpegs/B=2/lena.jpg)    |    ![lena](assets/decompressed/B=2/lena.png)    |
+|      33 | ![peppers](assets/jpegs/B=2/peppers.jpg) | ![peppers](assets/decompressed/B=2/peppers.png) |
 
-#### PSNR: _Peak signal-to-noise ratio_
+#### B=8
 
-![psnr](assets/graphs/psnr.png)
+| Jpeg QF |                   Jpeg                   |                  Auto-Encoder                   |
+|--------:|:----------------------------------------:|:-----------------------------------------------:|
+|      72 |  ![baboon](assets/jpegs/B=8/baboon.jpg)  |  ![baboon](assets/decompressed/B=8/baboon.png)  |
+|      90 |    ![lena](assets/jpegs/B=8/lena.jpg)    |    ![lena](assets/decompressed/B=8/lena.png)    |
+|      89 | ![peppers](assets/jpegs/B=8/peppers.jpg) | ![peppers](assets/decompressed/B=8/peppers.png) |
 
-#### BPP: _Bits per pixel_
+### PSNR / BPP
 
-![bpp](assets/graphs/bpp.png)
-
-#### Quality comparison:
-
-![quality](assets/graphs/quality-comparison.png)
+![psnr-bpp](assets/graphs/psnr-bpp.png)
 
 ## Notebooks
 
