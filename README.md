@@ -48,7 +48,11 @@ become a vector of size 32768. The vector is then quantized into `B` quantizatio
 
 ### Train quantization
 In training phase `noise` is appended to the input image. The `noise` is sampled from N(-0.5, 0.5) and then noise scaled by
-`B` quantization levels. So the final noise vector is N(-0.5, 0.5) * 2 ** (-B).
+`B` quantization levels. So the final noise vector is 
+```python
+scale = 2 ** -B
+noise = (torch.randn(n) * 0.5 - 0.5) * scale
+```
 
 ### Inference quantization
 In inference mode vector is quantized using `torch.clamp(0, 1)` and then scaled by `B` quantization levels.
