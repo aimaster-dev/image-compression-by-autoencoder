@@ -63,7 +63,8 @@ In inference mode vector is quantized using `torch.clamp(0, 1)` and then scaled 
 So the final quantized vector is
 
 ```python
-torch.clamp(vector, 0, 1) * 2 ** B + 0.5
+quantized = torch.clamp(vector, 0, 1) * 2 ** B + 0.5
+quantized = quantized.int()
 ```
 
 ## Quick start
@@ -98,8 +99,10 @@ bash scripts/decompress_all.sh 8 resnet18 cpu
 
 ## Compression
 
-In compression phase the encoder encodes the image into a vector of size 32768. Then the vector is quantized into
-`B` quantization levels. And finally the quantized vector is compressed using `Adaptive Arithmetic Coding`.
+In compression phase the encoder encodes the image into a vector of size 32768 (this is flattened feature map from last
+convolutional layer of the encoder of size 512 x 8 x 8).
+Then the vector is quantized into `B` quantization levels. And finally the quantized vector is compressed
+using `Adaptive Arithmetic Coding`. Arithmetic encoder takes quantized vector with values in range _[0; 2^B]_ as the input and outputs binary sequence. Encoding is performed using arithmetic-compressor python package. SimpleAdaptiveModel was used for probabilities update. This model gradually forgets old statistics with exponential moving average.
 
 Final compressed file consists of:
 
@@ -158,19 +161,19 @@ python train.py \
 
 #### B=2
 
-| Jpeg QF |                   Jpeg                   |                  Auto-Encoder                   |
-|--------:|:----------------------------------------:|:-----------------------------------------------:|
-|      12 |  ![baboon](assets/jpegs/B=2/baboon.jpg)  |  ![baboon](assets/decompressed/B=2/baboon.png)  |
-|      35 |    ![lena](assets/jpegs/B=2/lena.jpg)    |    ![lena](assets/decompressed/B=2/lena.png)    |
-|      33 | ![peppers](assets/jpegs/B=2/peppers.jpg) | ![peppers](assets/decompressed/B=2/peppers.png) |
+| (Jpeg QF, BPP) |                   Jpeg                   |                  Auto-Encoder                   |
+|---------------:|:----------------------------------------:|:-----------------------------------------------:|
+|      12, 0.605 |  ![baboon](assets/jpegs/B=2/baboon.jpg)  |  ![baboon](assets/decompressed/B=2/baboon.png)  |
+|      35, 0.605 |    ![lena](assets/jpegs/B=2/lena.jpg)    |    ![lena](assets/decompressed/B=2/lena.png)    |
+|      33, 0.605 | ![peppers](assets/jpegs/B=2/peppers.jpg) | ![peppers](assets/decompressed/B=2/peppers.png) |
 
 #### B=8
 
-| Jpeg QF |                   Jpeg                   |                  Auto-Encoder                   |
-|--------:|:----------------------------------------:|:-----------------------------------------------:|
-|      72 |  ![baboon](assets/jpegs/B=8/baboon.jpg)  |  ![baboon](assets/decompressed/B=8/baboon.png)  |
-|      90 |    ![lena](assets/jpegs/B=8/lena.jpg)    |    ![lena](assets/decompressed/B=8/lena.png)    |
-|      89 | ![peppers](assets/jpegs/B=8/peppers.jpg) | ![peppers](assets/decompressed/B=8/peppers.png) |
+| (Jpeg QF, BPP) |                   Jpeg                   |                  Auto-Encoder                   |
+|---------------:|:----------------------------------------:|:-----------------------------------------------:|
+|       72, 2.28 |  ![baboon](assets/jpegs/B=8/baboon.jpg)  |  ![baboon](assets/decompressed/B=8/baboon.png)  |
+|       90, 2.28 |    ![lena](assets/jpegs/B=8/lena.jpg)    |    ![lena](assets/decompressed/B=8/lena.png)    |
+|       89, 2.28 | ![peppers](assets/jpegs/B=8/peppers.jpg) | ![peppers](assets/decompressed/B=8/peppers.png) |
 
 ### PSNR / BPP
 
