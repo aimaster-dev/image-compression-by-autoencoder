@@ -1,7 +1,5 @@
 # Image compression using neural auto-encoder and quantization
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-
 This project is a simple implementation of auto-encoder neural network for image compression.
 The auto-encoder neural network is trained on the ImageNet dataset. The trained model is then used to compress and
 decompress the images.
